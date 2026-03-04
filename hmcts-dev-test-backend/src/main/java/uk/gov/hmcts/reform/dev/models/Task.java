@@ -9,6 +9,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 @Entity
 @Table(name = "tasks")
 public class Task {
@@ -17,13 +20,16 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     private String title;
 
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @NotNull
     private TaskStatus status;
 
+    @NotNull
     private LocalDateTime dueDateTime;
 
     public Task() {

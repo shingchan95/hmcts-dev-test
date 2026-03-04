@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.dev.models.Task;
 import uk.gov.hmcts.reform.dev.models.TaskStatus;
 import uk.gov.hmcts.reform.dev.repositories.TaskRepository;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,7 +31,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task) {
         Task savedTask = taskRepository.save(task);
         return ResponseEntity.ok(savedTask);
     }
@@ -47,7 +49,7 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Task> updateTaskStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> updateTaskStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
         Optional<Task> optionalTask = taskRepository.findById(id);
 
         if (optionalTask.isEmpty()) {
@@ -55,7 +57,20 @@ public class TaskController {
         }
 
         Task task = optionalTask.get();
-        task.setStatus(TaskStatus.valueOf(body.get("status")));
+        String statusValue = body.get("status");
+        if (statusValue == null || statusValue.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "status is required"));
+        }
+
+        try {
+            task.setStatus(TaskStatus.valueOf(statusValue));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "error", "invalid status",
+                "allowedValues", List.of("TODO", "IN_PROGRESS", "DONE")
+            ));
+        }
+        
         Task updatedTask = taskRepository.save(task);
 
         return ResponseEntity.ok(updatedTask);

@@ -108,4 +108,35 @@ class TaskControllerIntegrationTest {
         mockMvc.perform(delete("/tasks/" + savedTask.getId()))
             .andExpect(status().isNoContent());
     }
+
+    @Test
+    void shouldReturnBadRequestWhenTitleIsMissing() throws Exception {
+        mockMvc.perform(post("/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                    "description": "Missing title",
+                    "status": "TODO",
+                    "dueDateTime": "2026-03-05T18:00:00"
+                    }
+                    """))
+            .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    void shouldReturnBadRequestWhenStatusIsInvalid() throws Exception {
+        Task savedTask = taskRepository.save(
+            new Task(
+                "Invalid status test",
+                "Check invalid patch status",
+                TaskStatus.TODO,
+                LocalDateTime.of(2026, 3, 5, 18, 0)
+            )
+        );
+
+        mockMvc.perform(patch("/tasks/" + savedTask.getId() + "/status")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"status\":\"HELLO\"}"))
+            .andExpect(status().isBadRequest());
+    }
 }
