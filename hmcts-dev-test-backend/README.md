@@ -1,10 +1,81 @@
-# HMCTS Dev Test Backend
-This will be the backend for the brand new HMCTS case management system. As a potential candidate we are leaving
-this in your hands. Please refer to the brief for the complete list of tasks! Complete as much as you can and be
-as creative as you want.
+# HMCTS Developer Test Backend
 
-You should be able to run `./gradlew build` to start with to ensure it builds successfully. Then from that you
-can run the service in IntelliJ (or your IDE of choice) or however you normally would.
+This backend is based on the HMCTS starter project and has been extended with a PostgreSQL-backed task API.
 
-There is an example endpoint provided to retrieve an example of a case. You are free to add/remove fields as you
-wish.
+## Existing starter endpoints
+
+- `GET /`
+- `GET /get-example-case`
+
+## Added task endpoints
+
+### Create task
+- **Method:** `POST`
+- **Path:** `/tasks`
+
+**Request body**
+```json
+{
+  "title": "Finish HMCTS challenge",
+  "description": "Create Java backend task API",
+  "status": "TODO",
+  "dueDateTime": "2026-03-05T18:00:00"
+}
+```
+### Get all tasks
+- **Method:** `GET`
+- **Path:** `/tasks`
+
+### Get task by ID
+- **Method:** `GET`
+- **Path:** `/tasks/{id}`
+
+### Update task status
+- **Method:** `PATCH`
+- **Path:** `/tasks/{id}/status`
+
+**Request body**
+```json
+{
+  "status": "DONE"
+}
+```
+### Delete task
+- **Method:** `DELETE`
+- **Path:** `/tasks/{id}`
+
+## Tech stack
+- Java 21
+- Spring Boot
+- Spring Data JPA
+- PostgreSQL
+- Gradle
+
+## Environment variables
+
+The application uses the following environment variables:
+- SERVER_PORT
+- DB_HOST
+- DB_PORT
+- DB_NAME
+- DB_OPTIONS
+- DB_USER_NAME
+- DB_PASSWORD
+
+## Build the project
+```bash
+set -a
+source .env
+set +a
+JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./gradlew clean build
+```
+
+## Run the application
+```bash
+set -a
+source .env
+set +a
+JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./gradlew bootRun
+```
+The application runs on: http://localhost:4000
+
