@@ -1,0 +1,111 @@
+{% extends "template.njk" %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+
+{% block beforeContent %}
+  {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+  {{ govukBreadcrumbs({
+    items: [
+      { text: "Home", href: "/" },
+      { text: "Tasks" }
+    ]
+  }) }}
+{% endblock %}
+
+{% block content %}
+
+  <h1 class="govuk-heading-l">Tasks</h1>
+
+  {% if errors and errors.length > 0 %}
+    <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
+      <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+      <div class="govuk-errors-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          {% for e in errors %}
+            <li>{{ e }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
+
+  <h2 class="govuk-heading-m">Create task</h2>
+
+  <form method="post" action="/tasks">
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="title">Title</label>
+      <input class="govuk-input" id="title" name="title" type="text" required value="{{ form.title | default('') }}">
+    </div>
+
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="description">Description (optional)</label>
+      <textarea class="govuk-textarea" id="description" name="description">{{ form.description | default('') }}</textarea>
+    </div>
+
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="status">Status</label>
+      <select class="govuk-select" id="status" name="status" required>
+        <option value="TODO" {% if (form.status | default('TODO')) == "TODO" %}selected{% endif %}>TODO</option>
+        <option value="IN_PROGRESS" {% if form.status == "IN_PROGRESS" %}selected{% endif %}>IN_PROGRESS</option>
+        <option value="DONE" {% if form.status == "DONE" %}selected{% endif %}>DONE</option>
+      </select>
+    </div>
+
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="dueDateTime">Due date/time</label>
+      <input class="govuk-input" id="dueDateTime" name="dueDateTime" type="datetime-local" required value="{{ form.dueDateTime | default('') }}">
+    </div>
+
+    <button class="govuk-button" type="submit">Create</button>
+  </form>
+
+  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+  <h2 class="govuk-heading-m">Existing tasks</h2>
+
+  {% if not tasks or tasks.length == 0 %}
+    <p class="govuk-body">No tasks yet.</p>
+  {% else %}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header">Title</th>
+          <th class="govuk-table__header">Status</th>
+          <th class="govuk-table__header">Due</th>
+          <th class="govuk-table__header">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody class="govuk-table__body">
+        {% for t in tasks %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">
+              <strong>{{ t.title }}</strong>
+              {% if t.description %}
+                <div class="govuk-body-s">{{ t.description }}</div>
+              {% endif %}
+            </td>
+
+            <td class="govuk-table__cell">{{ t.status }}</td>
+            <td class="govuk-table__cell">{{ t.dueDateTime }}</td>
+
+            <td class="govuk-table__cell">
+              <form method="post" action="/tasks/{{ t.id }}/status" style="display:inline;">
+                <select class="govuk-select" name="status">
+                  <option value="TODO" {% if t.status == "TODO" %}selected{% endif %}>TODO</option>
+                  <option value="IN_PROGRESS" {% if t.status == "IN_PROGRESS" %}selected{% endif %}>IN_PROGRESS</option>
+                  <option value="DONE" {% if t.status == "DONE" %}selected{% endif %}>DONE</option>
+                </select>
+                <button class="govuk-button govuk-button--secondary" type="submit">Update</button>
+              </form>
+
+              <form method="post" action="/tasks/{{ t.id }}/delete" style="display:inline; margin-left: 8px;">
+                <button class="govuk-button govuk-button--warning" type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+{% endblock %}
