@@ -7,10 +7,14 @@ import request from 'supertest';
 /* eslint-disable jest/expect-expect */
 describe('Home page', () => {
   describe('on GET', () => {
-    test('should return sample home page', async () => {
+    test('should return the home page', async () => {
       await request(app)
         .get('/')
-        .expect(res => expect(res.status).to.equal(200));
+        .expect(200)
+        .expect((res: any) => {
+          expect(res.text).to.contain('Welcome to HMCTS tasks tracker!');
+          expect(res.text).to.contain('href="/tasks"');
+        });
     });
   });
 });
