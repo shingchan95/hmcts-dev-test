@@ -64,18 +64,12 @@ The application uses the following environment variables:
 
 ## Build the project
 ```bash
-set -a
-source .env
-set +a
-JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./gradlew clean build
+./gradlew clean build
 ```
 
 ## Run the application
 ```bash
-set -a
-source .env
-set +a
-JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home ./gradlew bootRun
+./gradlew bootRun
 ```
 The application runs on: http://localhost:4000
 
